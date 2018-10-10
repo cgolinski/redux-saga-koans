@@ -6,7 +6,7 @@ import {
 import getConfiguredStore from '../utils/get-configured-store';
 
 
-test.skip('...', () => {
+test('...', () => {
 
   const fruits = [];
 
@@ -19,7 +19,7 @@ test.skip('...', () => {
   function* sagaB() {
     yield fruits.push('banana');
     // yield call(sagaA, ['apple', 'kiwi', 'pineapple']);
-    // yield* sagaA(['apple', 'kiwi', 'pineapple']);
+    yield* sagaA(['apple', 'kiwi', 'pineapple']);
     // yield sagaA(['apple', 'kiwi', 'pineapple']);
     yield fruits.push('mango');
   }
