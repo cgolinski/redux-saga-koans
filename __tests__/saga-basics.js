@@ -251,7 +251,7 @@ test('I understand takeEvery', () => {
   ]);
 });
 
-test.skip('I know the basics of redux saga', () => {
+test('I know the basics of redux saga', () => {
   // call fetchData
   // call transform the data
   // put the data somewhere
@@ -260,12 +260,12 @@ test.skip('I know the basics of redux saga', () => {
     'Bill Gates, Steve Jobs, Jeff Bezos, Elon Musk'
   );
   const transformData = (data) => Promise.resolve(
-    data.split(', ').reduce((result, name) => {
+    data.split(', ').map(name => {
       const nameSegments = name.split(' ');
-      return Object.assign({}, result, {
+      return {
         first: nameSegments[0],
         last: nameSegments[1],
-      }, {});
+      };
     })
   );
 
@@ -282,15 +282,15 @@ test.skip('I know the basics of redux saga', () => {
   // ---
 
   function* rootSaga() {
-    yield call(watchTriggeringAction); 
+    const actionsFromStore = yield call(watchTriggeringAction); 
+
+    expect(actionsFromStore).toEqual([{ type: 'TRIGGER' }, { type: 'NAMES_RETRIEVED'}])
   }
  
   const { reduxStore } = getConfiguredStore({}, rootSaga);
 
-  console.log(reduxStore.dispatch.toString());
-  return reduxStore.dispatch({ type: 'TRIGGER' })
-  .then(() => {
-    const actions = reduxStore.getActions();
-    console.log(actions);
-  });
+  reduxStore.dispatch({ type: 'TRIGGER' });
+  
+  console.log('>>>>>>>> reduxStore.getActions', reduxStore.getActions()); 
+  // ^ why doesn't this include NAMES_RETRIEVED action?
 });
