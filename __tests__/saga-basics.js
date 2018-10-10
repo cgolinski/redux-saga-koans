@@ -5,7 +5,7 @@ import {
 } from 'redux-saga/effects';
 import getConfiguredStore from '../utils/get-configured-store';
 
-test.skip('I know what a saga is', () => {
+test('I know what a saga is', () => {
   // A saga is a generator.
 
   const fruits = [];
@@ -24,13 +24,13 @@ test.skip('I know what a saga is', () => {
   // middleware.
   const { reduxStore } = getConfiguredStore({}, saga);
 
-  expect(fruits).toEqual(); // FIX
+  expect(fruits).toEqual(['apple', 'orange', 'kiwi']); // FIX
 });
 
-test.skip('I know what `put` is and how to use it', () => {
+test('I know what `put` is and how to use it', () => {
 
   function* saga() {
-    yield put({ type: 'FRUIT' }); // FIX
+    yield put({ type: 'FRUIT', payload: 'apple' }); // FIX
   }
 
   const { reduxStore } = getConfiguredStore({}, saga);
@@ -41,11 +41,11 @@ test.skip('I know what `put` is and how to use it', () => {
   ]);
 });
 
-test.skip('I know that I can dispatch multiple actions from a saga', () => {
+test('I know that I can dispatch multiple actions from a saga', () => {
 
   function* saga() {
     yield put({ type: 'FRUIT', payload: 'apple' });
-    yield; // FIX
+    yield put({ type: 'FRUIT', payload: 'orange' }); // FIX
   }
 
   const { reduxStore } = getConfiguredStore({}, saga);
@@ -57,7 +57,7 @@ test.skip('I know that I can dispatch multiple actions from a saga', () => {
   ]);
 });
 
-test.skip('I know what `call` does', () => {
+test('I know what `call` does', () => {
   let fruitBasket = [];
 
   function addToFruitBasket(...fruit) {
@@ -67,7 +67,7 @@ test.skip('I know what `call` does', () => {
   function* saga() {
     yield call(addToFruitBasket, 'apple');
     yield call(addToFruitBasket, 'orange', 'pineapple');
-    yield call(addToFruitBasket); // FIX
+    yield call(addToFruitBasket, 'kiwi'); // FIX
   }
 
   const { reduxStore } = getConfiguredStore({}, saga);
@@ -76,7 +76,7 @@ test.skip('I know what `call` does', () => {
   // Try adding a few more fruit to the fruit basket
 });
 
-test.skip('I know that you can use returned values from a `call`', () => {
+test('I know that you can use returned values from a `call`', () => {
 
   function addToFruitBasket(basket, ...fruit) {
     return [...basket, ...fruit];
@@ -86,13 +86,13 @@ test.skip('I know that you can use returned values from a `call`', () => {
     const basket1 = yield call(addToFruitBasket, [], 'apple');
     const basket2 = yield call(addToFruitBasket, basket1, 'orange', 'pineapple');
     const basket3 = yield call(addToFruitBasket, basket2, 'kiwi');
-    expect(basket3).toEqual([]); // FIX
+    expect(basket3).toEqual(['apple', 'orange', 'pineapple', 'kiwi']); // FIX
   }
 
   const { reduxStore } = getConfiguredStore({}, saga);
 });
 
-test.skip('I know that you can `call` other generators', () => {
+test('I know that you can `call` other generators', () => {
 
   function* dispatchFruit(fruit) {
     yield put({ type: 'FRUIT_ADDED', payload: fruit });
@@ -106,10 +106,13 @@ test.skip('I know that you can `call` other generators', () => {
   const { reduxStore } = getConfiguredStore({}, saga);
   const actions = reduxStore.getActions();
 
-  expect(actions).toEqual([]); // FIX
+  expect(actions).toEqual([
+    {type: 'FRUIT_ADDED', payload: 'apple'}, 
+    {type: 'FRUIT_ADDED', payload: 'orange'}
+  ]); // FIX
 });
 
-test.skip('I know that you can `call` functions that return promises', (done) => {
+test('I know that you can `call` functions that return promises', (done) => {
   const responseData = {
     weight: 1,
     fruits: ['apple', 'orange'],
@@ -123,14 +126,17 @@ test.skip('I know that you can `call` functions that return promises', (done) =>
 
   function* saga() {
     const fruitBasket = yield call(fetchFruitBasket);
-    expect(fruitBasket).toEqual(); // FIX
+    expect(fruitBasket).toEqual({
+      weight: 1,
+      fruits: ['apple', 'orange'],
+    }); // FIX
     done();
   }
 
   const { reduxStore } = getConfiguredStore({}, saga);
 });
 
-test.skip('I understand the call effect', (done) => {
+test('I understand the call effect', (done) => {
   let names;
 
   function saveNames(data) {
@@ -150,6 +156,8 @@ test.skip('I understand the call effect', (done) => {
 
   function* saga() {
     // FIX
+    const fetchedNames = yield call(fetchNames);
+    yield call(saveNames, fetchedNames);
 
     // ---
 
@@ -166,7 +174,7 @@ test.skip('I understand the call effect', (done) => {
   const { reduxStore } = getConfiguredStore({}, saga);
 });
 
-test.skip('I know what `takeEvery` does', () => {
+test('I know what `takeEvery` does', () => {
 
   let count = 0;
   function incrementCount() {
@@ -182,10 +190,10 @@ test.skip('I know what `takeEvery` does', () => {
   reduxStore.dispatch({ type: 'SOME_ACTION_TYPE' });
   reduxStore.dispatch({ type: 'SOME_ACTION_TYPE' });
 
-  expect(count).toBe(); // FIX
+  expect(count).toBe(2); // FIX
 });
 
-test.skip('I know that you can pass a generator to `takeEvery`', () => {
+test('I know that you can pass a generator to `takeEvery`', () => {
   let count = 0;
   function incrementCount() {
     count++;
@@ -205,10 +213,10 @@ test.skip('I know that you can pass a generator to `takeEvery`', () => {
 
   reduxStore.dispatch({ type: 'SOME_ACTION_TYPE' });
 
-  expect(count).toBe(); // FIX
+  expect(count).toBe(3); // FIX
 });
 
-test.skip('I understand takeEvery', () => {
+test('I understand takeEvery', () => {
   const basket = [];
 
   function* addFruits() {
@@ -224,7 +232,9 @@ test.skip('I understand takeEvery', () => {
   }
 
   // FIX
-  function saga() {
+  function* saga() {
+    yield takeEvery('FRUITS_WANTED', addFruits);
+    yield takeEvery('VEGGIES_WANTED', addVeggies);
   }
   // ---
 
@@ -245,7 +255,7 @@ test.skip('I know the basics of redux saga', () => {
   // call fetchData
   // call transform the data
   // put the data somewhere
-
+  
   const getData = () => Promise.resolve(
     'Bill Gates, Steve Jobs, Jeff Bezos, Elon Musk'
   );
@@ -272,15 +282,15 @@ test.skip('I know the basics of redux saga', () => {
   // ---
 
   function* rootSaga() {
-    yield call(watchTriggeringAction);
+    yield call(watchTriggeringAction); 
   }
-
+ 
   const { reduxStore } = getConfiguredStore({}, rootSaga);
 
   console.log(reduxStore.dispatch.toString());
   return reduxStore.dispatch({ type: 'TRIGGER' })
-    .then(() => {
-      const actions = reduxStore.getActions();
-      console.log(actions);
-    });
+  .then(() => {
+    const actions = reduxStore.getActions();
+    console.log(actions);
+  });
 });
