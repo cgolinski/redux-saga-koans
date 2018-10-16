@@ -126,6 +126,11 @@ test('I know that you can `call` functions that return promises', (done) => {
 
   function* saga() {
     const fruitBasket = yield call(fetchFruitBasket);
+    // ^ This function will work without the call, but it is convention to use the call when
+    // the function is doing something async (network request, calling another generator, etc.)
+    // It's convention because it's better in unit testing, so you can check that the async fn
+    // is being called without actually having to call the backend.
+    // call(fn) allows redux-saga to call fn instead of calling fn yourself.
     expect(fruitBasket).toEqual({
       weight: 1,
       fruits: ['apple', 'orange'],
@@ -288,9 +293,15 @@ test('I know the basics of redux saga', () => {
   }
  
   const { reduxStore } = getConfiguredStore({}, rootSaga);
+  // ^ getConfigureStore creates the store, and reduxStore is destructured from it. Then 
+  // the rootSaga middleware is applied to it. So it is possible for reduxStore methods to
+  // be called before rootSaga has finished running and before the middleware has been applied.
 
   reduxStore.dispatch({ type: 'TRIGGER' });
   
   console.log('>>>>>>>> reduxStore.getActions', reduxStore.getActions()); 
-  // ^ why doesn't this include NAMES_RETRIEVED action?
+  // ^ This does not include NAMES_RETRIEVED action because this gets called synchronously,
+  // before the async rootSaga is finished.
+  // Yes, reduxStore does exist already, because it is destructured from the result of the 
+  // synchromous getConfiguredStore call.
 });
